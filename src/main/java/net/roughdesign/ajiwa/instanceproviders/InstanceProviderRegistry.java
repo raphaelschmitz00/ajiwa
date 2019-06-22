@@ -1,10 +1,6 @@
 package net.roughdesign.ajiwa.instanceproviders;
 
-import net.roughdesign.ajiwa.exceptions.CircularDependencyException;
-import net.roughdesign.ajiwa.exceptions.MoreThanOneConstructorException;
-import net.roughdesign.ajiwa.exceptions.NoAvailableConstructorException;
-import net.roughdesign.ajiwa.exceptions.UnresolvedParameterException;
-
+import net.roughdesign.ajiwa.exceptions.*;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -20,7 +16,30 @@ public class InstanceProviderRegistry {
     public InstanceProviderRegistry() {
 
         instanceProviders = new HashMap<>();
+    }
 
+
+    public void register(Class<?> klass, InstanceProvider instanceProvider) {
+        if (instanceProviders.containsKey(klass)) throw new AmbiguousBindingException(klass.toString());
+        instanceProviders.put(klass, instanceProvider);
+    }
+
+
+    public <T> StoredValueProvider<T> createStoredValueProvider(final Class<T> klass,
+                                                                ArrayList<Class<?>> requestChain) {
+
+        ArrayList<Class<?>> updatedRequestChain = new ArrayList<>(requestChain);
+        updatedRequestChain.add(klass);
+        ConstructorCaller<T> constructorCaller = createConstructorCaller(klass, updatedRequestChain);
+
+        T instance = constructorCaller.getInstance();
+        return new StoredValueProvider<>(instance);
+    }
+
+
+    public <T> ConstructorCaller<T> createConstructorCaller(Class<T> klass, ArrayList<Class<?>> requestChain) {
+        Constructor<T> constructor = getConstructor(klass);
+        return createConstructorCaller(constructor, requestChain);
     }
 
 
@@ -34,7 +53,9 @@ public class InstanceProviderRegistry {
         if (klass.isInterface()) throw new UnresolvedParameterException("Can't auto-bind " + klass);
         if (klass.isArray()) throw new UnresolvedParameterException("Can't auto-bind " + klass);
 
-        return createStoredValueProvider(klass, requestChain);
+        StoredValueProvider<T> storedValueProvider = createStoredValueProvider(klass, requestChain);
+        instanceProviders.put(klass, storedValueProvider);
+        return storedValueProvider;
     }
 
 
@@ -46,7 +67,7 @@ public class InstanceProviderRegistry {
         builder.append("Circular Dependency detected!\n\n");
 
         for (Class<?> loopKlass : requestChain) {
-            builder.append(loopKlass.toGenericString());
+            builder.append(loopKlass.toString());
             builder.append("\n");
         }
         throw new CircularDependencyException(builder.toString());
@@ -57,22 +78,6 @@ public class InstanceProviderRegistry {
     private <T> InstanceProvider<T> getInstanceProvider(final Class<T> klass) {
 
         return instanceProviders.get(klass);
-    }
-
-
-    private <T> StoredValueProvider<T> createStoredValueProvider(final Class<T> klass,
-                                                                 ArrayList<Class<?>> requestChain) {
-
-        ArrayList<Class<?>> updatedRequestChain = new ArrayList<>(requestChain);
-        updatedRequestChain.add(klass);
-
-        Constructor<T> constructor = getConstructor(klass);
-        ConstructorCaller<T> constructorCaller = createConstructorCaller(constructor, updatedRequestChain);
-
-        T instance = constructorCaller.getInstance();
-        StoredValueProvider<T> storedValueProvider = new StoredValueProvider<>(instance);
-        instanceProviders.put(klass, storedValueProvider);
-        return storedValueProvider;
     }
 
 

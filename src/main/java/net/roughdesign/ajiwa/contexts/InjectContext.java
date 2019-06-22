@@ -4,12 +4,13 @@ import net.roughdesign.ajiwa.bindings.BindingHolder;
 import net.roughdesign.ajiwa.instanceproviders.InstanceProvider;
 import net.roughdesign.ajiwa.instanceproviders.InstanceProviderRegistry;
 
+
+
 import java.util.ArrayList;
 
 public class InjectContext {
 
     private InstanceProviderRegistry instanceProviderRegistry;
-
 
 
     public InjectContext() {
@@ -20,13 +21,7 @@ public class InjectContext {
 
 
     public <T> BindingHolder<T> bind(Class<T> klass) {
-
-        //ComposingResolveProvider<T> resolveProvider = new ComposingResolveProvider<T>(klass);
-        //BindingHolder<T> bindingHolder = new BindingHolder<>(klass, resolveProvider);
-
-        //bindingHolderDictionary.put(klass, bindingHolder);
-
-        return null;
+        return new BindingHolder<>(instanceProviderRegistry, klass);
     }
 
 
