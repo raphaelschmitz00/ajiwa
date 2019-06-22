@@ -1,5 +1,6 @@
 package net.roughdesign.ajiwa.bindings;
 
+import net.roughdesign.ajiwa.instanceproviders.ConstructorCaller;
 import net.roughdesign.ajiwa.instanceproviders.InstanceProviderRegistry;
 import net.roughdesign.ajiwa.instanceproviders.StoredValueProvider;
 
@@ -32,4 +33,10 @@ public class BindingHolder<T> {
     }
 
 
+    public <TInput extends T> void toTransient(Class<TInput> klass) {
+
+        ConstructorCaller<TInput> constructorCaller =
+                instanceProviderRegistry.createConstructorCaller(klass, new ArrayList<Class<?>>());
+        instanceProviderRegistry.register(this.klass, constructorCaller);
+    }
 }

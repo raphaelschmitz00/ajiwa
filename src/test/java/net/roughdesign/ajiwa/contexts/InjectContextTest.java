@@ -81,6 +81,17 @@ public class InjectContextTest {
         Assertions.assertEquals(ClassImplementingInterface.class, result.getClass());
     }
 
+    @Test
+    public void bindingToImplementingClassIsSingleton() {
+
+        InjectContext injectContext = new InjectContext();
+        injectContext.bind(ExampleInterface.class).To(ClassImplementingInterface.class);
+        ExampleInterface resultA = injectContext.resolve(ExampleInterface.class);
+        ExampleInterface resultB = injectContext.resolve(ExampleInterface.class);
+
+        Assertions.assertEquals(resultA, resultB);
+    }
+
 
     @Test
     public void canBindEnum() {
@@ -90,6 +101,17 @@ public class InjectContextTest {
         ExampleEnum result = injectContext.resolve(ExampleEnum.class);
 
         Assertions.assertEquals(ExampleEnum.ValueB, result);
+    }
+
+    @Test
+    public void canBindTransient() {
+
+        InjectContext injectContext = new InjectContext();
+        injectContext.bind(ExampleInterface.class).toTransient(ClassImplementingInterface.class);
+        ExampleInterface resultA = injectContext.resolve(ExampleInterface.class);
+        ExampleInterface resultB = injectContext.resolve(ExampleInterface.class);
+
+        Assertions.assertNotEquals(resultA, resultB);
     }
 
 
