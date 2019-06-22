@@ -3,10 +3,11 @@ package net.roughdesign.ajiwa.contexts;
 import net.roughdesign.ajiwa.contexts.exampleclasses.*;
 import net.roughdesign.ajiwa.exceptions.CircularDependencyException;
 import net.roughdesign.ajiwa.exceptions.UnresolvedParameterException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class InjectContextTest {
 
@@ -17,15 +18,18 @@ public class InjectContextTest {
         InjectContext injectContext = new InjectContext();
         NoParameterClass result = injectContext.resolve(NoParameterClass.class);
 
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
 
-    @Test(expected = UnresolvedParameterException.class)
+    @Test
     public void autoResolveThrowsForUnresolvableDependency() {
 
         InjectContext injectContext = new InjectContext();
-        injectContext.resolve(IntParameterClass.class);
+
+        Assertions.assertThrows(UnresolvedParameterException.class,
+                () -> injectContext.resolve(IntParameterClass.class));
+
     }
 
 
@@ -35,15 +39,18 @@ public class InjectContextTest {
         InjectContext injectContext = new InjectContext();
         AutoResolvableComplexClass result = injectContext.resolve(AutoResolvableComplexClass.class);
 
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
 
-    @Test(expected = CircularDependencyException.class)
+    @Test
     public void autoResolveThrowsForCircularDependency() {
 
         InjectContext injectContext = new InjectContext();
-        injectContext.resolve(CircularDependencyA.class);
+
+        Assertions.assertThrows(CircularDependencyException.class,
+                () -> injectContext.resolve(CircularDependencyA.class));
+
     }
 
 
@@ -55,7 +62,7 @@ public class InjectContextTest {
         injectContext.bind(NoParameterClass.class).FromInstance(instance);
         Object result = injectContext.resolve(Object.class);
 
-        assertEquals(instance, result);
+        Assertions.assertEquals(instance, result);
     }
 
 
@@ -66,7 +73,7 @@ public class InjectContextTest {
         injectContext.bind(NoParameterClass.class).ToSelf();
         NoParameterClass result = injectContext.resolve(NoParameterClass.class);
 
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
 
@@ -77,7 +84,7 @@ public class InjectContextTest {
         injectContext.bind(ExampleInterface.class).To(ClassImplementingInterface.class);
         ExampleInterface result = injectContext.resolve(ExampleInterface.class);
 
-        assertEquals(ClassImplementingInterface.class, result.getClass());
+        Assertions.assertEquals(ClassImplementingInterface.class, result.getClass());
     }
 
 
@@ -88,7 +95,7 @@ public class InjectContextTest {
         injectContext.bind(ExampleEnum.class).FromInstance(ExampleEnum.ValueB);
         ExampleEnum result = injectContext.resolve(ExampleEnum.class);
 
-        assertEquals(ExampleEnum.ValueB, result);
+        Assertions.assertEquals(ExampleEnum.ValueB, result);
     }
 
 
@@ -100,7 +107,7 @@ public class InjectContextTest {
         injectContext.bind(IntParameterClass.class).FromInstance(new IntParameterClass(3));
         ComplexClass result = injectContext.resolve(ComplexClass.class);
 
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
 
