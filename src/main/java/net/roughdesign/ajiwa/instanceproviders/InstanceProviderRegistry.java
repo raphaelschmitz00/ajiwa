@@ -1,10 +1,6 @@
 package net.roughdesign.ajiwa.instanceproviders;
 
-import net.roughdesign.ajiwa.exceptions.CircularDependencyException;
-import net.roughdesign.ajiwa.exceptions.MoreThanOneConstructorException;
-import net.roughdesign.ajiwa.exceptions.NoAvailableConstructorException;
-import net.roughdesign.ajiwa.exceptions.UnresolvedParameterException;
-
+import net.roughdesign.ajiwa.exceptions.*;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -21,6 +17,12 @@ public class InstanceProviderRegistry {
 
         instanceProviders = new HashMap<>();
 
+    }
+
+
+    public void register(Class<?> klass, InstanceProvider instanceProvider) {
+        if (instanceProviders.containsKey(klass)) throw new AmbiguousBindingException(klass.toString());
+        instanceProviders.put(klass, instanceProvider);
     }
 
 
@@ -46,7 +48,7 @@ public class InstanceProviderRegistry {
         builder.append("Circular Dependency detected!\n\n");
 
         for (Class<?> loopKlass : requestChain) {
-            builder.append(loopKlass.toGenericString());
+            builder.append(loopKlass.toString());
             builder.append("\n");
         }
         throw new CircularDependencyException(builder.toString());

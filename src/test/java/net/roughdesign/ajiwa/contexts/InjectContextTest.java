@@ -5,8 +5,7 @@ import net.roughdesign.ajiwa.exceptions.CircularDependencyException;
 import net.roughdesign.ajiwa.exceptions.UnresolvedParameterException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.function.Executable;
 
 
 public class InjectContextTest {
@@ -25,11 +24,14 @@ public class InjectContextTest {
     @Test
     public void autoResolveThrowsForUnresolvableDependency() {
 
-        InjectContext injectContext = new InjectContext();
+        final InjectContext injectContext = new InjectContext();
 
-        Assertions.assertThrows(UnresolvedParameterException.class,
-                () -> injectContext.resolve(IntParameterClass.class));
-
+        Assertions.assertThrows(UnresolvedParameterException.class, new Executable() {
+            @Override
+            public void execute() {
+                injectContext.resolve(IntParameterClass.class);
+            }
+        });
     }
 
 
@@ -46,11 +48,14 @@ public class InjectContextTest {
     @Test
     public void autoResolveThrowsForCircularDependency() {
 
-        InjectContext injectContext = new InjectContext();
+        final InjectContext injectContext = new InjectContext();
 
-        Assertions.assertThrows(CircularDependencyException.class,
-                () -> injectContext.resolve(CircularDependencyA.class));
-
+        Assertions.assertThrows(CircularDependencyException.class, new Executable() {
+            @Override
+            public void execute() {
+                injectContext.resolve(CircularDependencyA.class);
+            }
+        });
     }
 
 
@@ -59,21 +64,10 @@ public class InjectContextTest {
 
         InjectContext injectContext = new InjectContext();
         NoParameterClass instance = new NoParameterClass();
-        injectContext.bind(NoParameterClass.class).FromInstance(instance);
-        Object result = injectContext.resolve(Object.class);
+        injectContext.bind(NoParameterClass.class).toInstance(instance);
+        Object result = injectContext.resolve(NoParameterClass.class);
 
         Assertions.assertEquals(instance, result);
-    }
-
-
-    @Test
-    public void canBindToSelf() {
-
-        InjectContext injectContext = new InjectContext();
-        injectContext.bind(NoParameterClass.class).ToSelf();
-        NoParameterClass result = injectContext.resolve(NoParameterClass.class);
-
-        Assertions.assertNotNull(result);
     }
 
 
@@ -92,7 +86,7 @@ public class InjectContextTest {
     public void canBindEnum() {
 
         InjectContext injectContext = new InjectContext();
-        injectContext.bind(ExampleEnum.class).FromInstance(ExampleEnum.ValueB);
+        injectContext.bind(ExampleEnum.class).toInstance(ExampleEnum.ValueB);
         ExampleEnum result = injectContext.resolve(ExampleEnum.class);
 
         Assertions.assertEquals(ExampleEnum.ValueB, result);
@@ -104,7 +98,7 @@ public class InjectContextTest {
 
         InjectContext injectContext = new InjectContext();
         injectContext.bind(ExampleInterface.class).To(ClassImplementingInterface.class);
-        injectContext.bind(IntParameterClass.class).FromInstance(new IntParameterClass(3));
+        injectContext.bind(IntParameterClass.class).toInstance(new IntParameterClass(3));
         ComplexClass result = injectContext.resolve(ComplexClass.class);
 
         Assertions.assertNotNull(result);
