@@ -3,6 +3,8 @@ package net.roughdesign.ajiwa.bindings;
 import net.roughdesign.ajiwa.instanceproviders.InstanceProviderRegistry;
 import net.roughdesign.ajiwa.instanceproviders.StoredValueProvider;
 
+import java.util.ArrayList;
+
 public class BindingHolder<T> {
 
     private final InstanceProviderRegistry instanceProviderRegistry;
@@ -22,8 +24,11 @@ public class BindingHolder<T> {
     }
 
 
-    public <Tinput extends T> void To(Class<Tinput> klass) {
-        throw new UnsupportedOperationException();
+    public <TInput extends T> void To(Class<TInput> klass) {
+
+        StoredValueProvider<TInput> storedValueProvider =
+                instanceProviderRegistry.createStoredValueProvider(klass, new ArrayList<Class<?>>());
+        instanceProviderRegistry.register(this.klass, storedValueProvider);
     }
 
 
