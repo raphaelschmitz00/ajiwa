@@ -2,7 +2,7 @@ package net.roughdesign.ajiwa.exceptions;
 
 public class NoAvailableConstructorException extends RuntimeException {
 
-    public NoAvailableConstructorException(String errorMessage) {
+    public NoAvailableConstructorException(final String errorMessage) {
         super(errorMessage);
     }
 }
