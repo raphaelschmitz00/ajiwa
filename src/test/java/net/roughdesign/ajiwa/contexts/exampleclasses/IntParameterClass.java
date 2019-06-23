@@ -2,7 +2,7 @@ package net.roughdesign.ajiwa.contexts.exampleclasses;
 
 public class IntParameterClass {
 
-    public IntParameterClass(int content) {
+    public IntParameterClass(final int content) {
 
     }
 }

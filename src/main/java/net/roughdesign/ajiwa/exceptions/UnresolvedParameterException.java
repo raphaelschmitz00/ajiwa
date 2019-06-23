@@ -1,10 +1,12 @@
 package net.roughdesign.ajiwa.exceptions;
 
+
 public class UnresolvedParameterException extends RuntimeException {
 
 
-    public UnresolvedParameterException(String errorMessage) {
-        super(errorMessage);
+    public UnresolvedParameterException(final Class<?> klass) {
+
+        super("Can't auto-bind " + klass);
     }
 }
 
