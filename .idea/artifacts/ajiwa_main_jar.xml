@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ajiwa_main:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ajiwa_main_jar</output-path>
+    <root id="archive" name="ajiwa_main.jar">
+      <element id="module-output" name="ajiwa_main" />
+    </root>
+  </artifact>
+</component>
