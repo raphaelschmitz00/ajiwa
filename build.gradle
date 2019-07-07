@@ -1,21 +1,95 @@
 plugins {
     id 'java'
+    id 'maven'
+    id 'signing'
 }
 
+
 group 'net.roughdesign.ajiwa'
-version '1.0-SNAPSHOT'
+archivesBaseName = "ajiwa"
+version '1.0.0'
 sourceCompatibility = 1.7
+
 
 repositories {
     mavenCentral()
 }
 
+
 dependencies {
-   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
 
 test {
     useJUnitPlatform()
+}
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.java
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    useGpgCmd()
+    sign configurations.archives
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+
+            pom.artifactId = 'ajiwa'
+            pom.project {
+                name 'AJIWA'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Automatic Java Injection Without Attributes.'
+                url 'http://www.roughdesign.net/swms'
+
+                scm {
+                    url 'https://github.com/raphaelschmitz00/ajiwa'
+                    connection 'scm:git:git://github.com/raphaelschmitz00/ajiwa.git'
+                    developerConnection 'scm:git:ssh://git@github.com:raphaelschmitz00/ajiwa.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://github.com/raphaelschmitz00/ajiwa/blob/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'raphaelschmitz00'
+                        name 'Raphael Schmitz'
+                        email 'raphaelschmitz00@gmail.com'
+                    }
+                }
+            }
+        }
+    }
 }
